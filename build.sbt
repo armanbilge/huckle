@@ -1,0 +1,38 @@
+ThisBuild / tlBaseVersion := "0.0"
+
+ThisBuild / organization := "com.armanbilge"
+ThisBuild / organizationName := "Arman Bilge"
+ThisBuild / developers += tlGitHubDev("armanbilge", "Arman Bilge")
+ThisBuild / startYear := Some(2023)
+
+ThisBuild / tlSonatypeUseLegacyHost := false
+
+ThisBuild / crossScalaVersions := Seq("3.2.2")
+
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
+ThisBuild / tlJdkRelease := Some(8)
+
+val CatsEffectVersion = "3.4.7"
+val Fs2Version = "3.6.1"
+val Http4sVersion = "0.23.18"
+
+ThisBuild / scalacOptions ++= Seq("-new-syntax", "-indent", "-source:future")
+
+val commonJvmSettings = Seq(
+  fork := true,
+)
+
+lazy val root = tlCrossRootProject.aggregate(
+  resolver,
+)
+
+lazy val resolver = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .in(file("resolver"))
+  .settings(
+    name := "huckle-resolver",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %%% "cats-effect" % CatsEffectVersion,
+      "co.fs2" %%% "fs2-io" % Fs2Version,
+      "org.http4s" %%% "http4s-client" % Http4sVersion,
+    ),
+  )
