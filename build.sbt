@@ -15,6 +15,8 @@ ThisBuild / tlJdkRelease := Some(8)
 val CatsEffectVersion = "3.4.7"
 val Fs2Version = "3.6.1"
 val Http4sVersion = "0.23.18"
+val Fs2DataVersion = "1.6.1"
+val Http4sFs2DataVersion = "0.1.0"
 
 ThisBuild / scalacOptions ++= Seq("-new-syntax", "-indent", "-source:future")
 
@@ -23,16 +25,19 @@ val commonJvmSettings = Seq(
 )
 
 lazy val root = tlCrossRootProject.aggregate(
-  resolver,
+  maven,
 )
 
-lazy val resolver = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .in(file("resolver"))
+lazy val maven = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("maven"))
   .settings(
-    name := "huckle-resolver",
+    name := "huckle-maven",
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "cats-effect" % CatsEffectVersion,
       "co.fs2" %%% "fs2-io" % Fs2Version,
       "org.http4s" %%% "http4s-client" % Http4sVersion,
+      "org.gnieh" %%% "fs2-data-xml" % Fs2DataVersion,
+      "org.http4s" %%% "http4s-fs2-data-xml" % Http4sFs2DataVersion,
     ),
   )
