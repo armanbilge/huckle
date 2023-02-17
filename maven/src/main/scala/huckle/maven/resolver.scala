@@ -27,7 +27,7 @@ trait Resolver[F[_]]:
 
 object Resolver:
   def apply[F[_]: Files](
-    cache: Path,
-    repositories: List[Uri],
-    client: Client[F]
+      cache: Path,
+      repositories: List[Uri],
+      client: Client[F],
   )(using F: Concurrent[F]): Resolver[F] = ???
