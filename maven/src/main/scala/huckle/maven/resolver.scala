@@ -22,12 +22,12 @@ import fs2.io.file.Path
 import org.http4s.Uri
 import org.http4s.client.Client
 
-trait Resolver[F[_]]:
-  def resolve(coordinates: MavenCoordinates): F[Path]
+trait MavenResolver[F[_]]:
+  def resolve(coordinates: MavenCoordinates): F[(MavenProject, Path)]
 
-object Resolver:
+object MavenResolver:
   def apply[F[_]: Files](
       cache: Path,
       repositories: List[Uri],
       client: Client[F],
-  )(using F: Concurrent[F]): Resolver[F] = ???
+  )(using F: Concurrent[F]): MavenResolver[F] = ???

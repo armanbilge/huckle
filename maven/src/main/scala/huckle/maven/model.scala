@@ -16,17 +16,39 @@
 
 package huckle.maven
 
+import cats.syntax.all.*
+
 final case class MavenCoordinates(
     groupId: String,
     artifactId: String,
     version: String,
 )
 
+object MavenCoordinates:
+  def fromXml(node: xml.Node): Either[Throwable, MavenCoordinates] =
+    Either.catchNonFatal {
+      MavenCoordinates(
+        (node \ "groupId").text,
+        (node \ "artifactId").text,
+        (node \ "version").text,
+      )
+    }
+
 final case class MavenProject(
     coordinates: MavenCoordinates,
     dependencies: List[MavenDependency],
 )
 
+object MavenProject:
+  def fromXml(node: xml.Node): Either[Throwable, MavenProject] =
+    val coordinates = MavenCoordinates.fromXml(node)
+    val dependencies = (node \ "dependencies").toList.traverse(MavenDependency.fromXml(_))
+    (coordinates, dependencies).mapN(MavenProject(_, _))
+
 final case class MavenDependency(
     coordinates: MavenCoordinates,
 )
+
+object MavenDependency:
+  def fromXml(node: xml.Node): Either[Throwable, MavenDependency] =
+    MavenCoordinates.fromXml(node).map(MavenDependency(_))

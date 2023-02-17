@@ -37,7 +37,6 @@ lazy val maven = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       "org.typelevel" %%% "cats-effect" % CatsEffectVersion,
       "co.fs2" %%% "fs2-io" % Fs2Version,
       "org.http4s" %%% "http4s-client" % Http4sVersion,
-      "org.gnieh" %%% "fs2-data-xml" % Fs2DataVersion,
-      "org.http4s" %%% "http4s-fs2-data-xml" % Http4sFs2DataVersion,
+      "org.http4s" %%% "http4s-fs2-data-xml-scala" % Http4sFs2DataVersion,
     ),
   )
