@@ -40,3 +40,12 @@ lazy val maven = crossProject(JVMPlatform, JSPlatform)
       "org.http4s" %%% "http4s-fs2-data-xml-scala" % Http4sFs2DataVersion,
     ),
   )
+
+lazy val tests = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("tests"))
+  .enablePlugins(NoPublishPlugin)
+  .dependsOn(maven)
+  .settings(
+    (Test / test) := (Compile / run).toTask("").value,
+  )
