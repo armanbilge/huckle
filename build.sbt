@@ -28,7 +28,7 @@ lazy val root = tlCrossRootProject.aggregate(
   maven,
 )
 
-lazy val maven = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+lazy val maven = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("maven"))
   .settings(
