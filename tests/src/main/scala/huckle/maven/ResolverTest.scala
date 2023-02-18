@@ -15,16 +15,29 @@
  */
 
 package huckle
+package maven
 
 import cats.effect.IO
-import cats.effect.IOApp
-import huckle.maven.ResolverTest
-import org.http4s.ember.client.EmberClientBuilder
+import cats.effect.Resource
+import fs2.io.file.Files
+import org.http4s.client.Client
+import org.http4s.syntax.all.*
 
-object TestRunner extends IOApp.Simple:
-  def tests = for
-    client <- EmberClientBuilder.default[IO].build
-    resolverTest <- ResolverTest(client)
-  yield resolverTest
+object ResolverTest:
+  def apply(client: Client[IO]): Resource[IO, Test] = Files[IO].tempDirectory.map { cache =>
 
-  def run = tests.use(_.test)
+    val resolver = MavenResolver(
+      cache,
+      List(
+        uri"https://repo1.maven.org/maven2/",
+        uri"https://s01.oss.sonatype.org/content/repositories/snapshots/",
+      ),
+      client,
+    )
+
+    val resolveCats = Test("resolve Cats v2.9.0") {
+      resolver.resolve(MavenCoordinates("org.typelevel", "cats-core_3", "2.9.0")).debug().void
+    }
+
+    resolveCats
+  }

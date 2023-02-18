@@ -48,4 +48,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .dependsOn(maven)
   .settings(
     (Test / test) := (Compile / run).toTask("").value,
+    libraryDependencies ++= Seq(
+      "org.http4s" %%% "http4s-ember-client" % Http4sVersion,
+    ),
   )
