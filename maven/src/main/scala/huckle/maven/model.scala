@@ -17,6 +17,7 @@
 package huckle.maven
 
 import cats.syntax.all.*
+import fs2.data.xml.dom.DocumentBuilder
 
 final case class MavenCoordinates(
     groupId: String,
@@ -25,7 +26,7 @@ final case class MavenCoordinates(
 )
 
 object MavenCoordinates:
-  def fromXml(node: xml.Node): Either[Throwable, MavenCoordinates] =
+  def fromXml(node: xml.NodeSeq): Either[Throwable, MavenCoordinates] =
     Either.catchNonFatal {
       MavenCoordinates(
         (node \ "groupId").text,
@@ -40,7 +41,7 @@ final case class MavenProject(
 )
 
 object MavenProject:
-  def fromXml(node: xml.Node): Either[Throwable, MavenProject] =
+  def fromXml(node: xml.Document): Either[Throwable, MavenProject] =
     val coordinates = MavenCoordinates.fromXml(node)
     val dependencies = (node \ "dependencies").toList.traverse(MavenDependency.fromXml(_))
     (coordinates, dependencies).mapN(MavenProject(_, _))
