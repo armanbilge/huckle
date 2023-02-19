@@ -72,12 +72,13 @@ object MavenResolver:
       }
 
     def downloadMavenProject(repository: Uri): F[Unit] =
-      List("pom", "jar").parTraverse_ { ext =>
-        val fn = getFileName(ext)
-        val uri = toUri(repository) / fn
-        val path = cache / toPath / fn
-        client.expect(uri)(EntityDecoder.binFile(path))
-      }
+      val path = cache / toPath
+      Files[F].createDirectories(path) *>
+        List("pom", "jar").parTraverse_ { ext =>
+          val fn = getFileName(ext)
+          val uri = toUri(repository) / fn
+          client.expect(uri)(EntityDecoder.binFile(path / fn))
+        }
 
     def getMavenProject: F[(MavenProject, Path)] =
       val path = cache / toPath
