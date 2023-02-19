@@ -45,8 +45,8 @@ object MavenResolver:
     def toPath =
       Path(coordinates.groupId.replace('.', '/')) / coordinates.artifactId / coordinates.version
 
-    def toUriPath =
-      Uri.Path(coordinates.groupId.split('.').map(Uri.Path.Segment(_)).toVector) /
+    def toUri(repo: Uri) =
+      repo / coordinates.groupId.replace('.', '/') /
         coordinates.artifactId / coordinates.version
 
     def isCached: F[Boolean] =
@@ -56,7 +56,7 @@ object MavenResolver:
     def resolve(repos: NonEmptyList[Uri]): F[Option[Uri]] =
       val race = repos
         .map { repo =>
-          val uri = repo.withPath(toUriPath / getFileName("pom"))
+          val uri = toUri(repo) / getFileName("pom")
           client
             .successful(Request(Method.HEAD, uri))
             .ifM(
@@ -74,7 +74,7 @@ object MavenResolver:
     def downloadMavenProject(repository: Uri): F[Unit] =
       List("pom", "jar").parTraverse_ { ext =>
         val fn = getFileName(ext)
-        val uri = repository.withPath(toUriPath / fn)
+        val uri = toUri(repository) / fn
         val path = cache / toPath / fn
         client.expect(uri)(EntityDecoder.binFile(path))
       }
