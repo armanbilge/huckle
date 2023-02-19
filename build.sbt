@@ -26,6 +26,7 @@ val commonJvmSettings = Seq(
 
 lazy val root = tlCrossRootProject.aggregate(
   maven,
+  tests,
 )
 
 lazy val maven = crossProject(JVMPlatform, JSPlatform)
