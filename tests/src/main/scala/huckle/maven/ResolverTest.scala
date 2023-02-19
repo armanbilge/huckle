@@ -36,7 +36,7 @@ object ResolverTest:
     )
 
     val resolveCats = Test("resolve Cats v2.9.0") {
-      resolver.resolve(MavenCoordinates("org.typelevel", "cats-core_3", "2.9.0")).debug().void
+      resolver.resolve(MavenCoordinates("org.typelevel", "cats-core_3", "2.9.0")).void
     }
 
     resolveCats
