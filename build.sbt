@@ -53,6 +53,10 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform)
       "org.http4s" %%% "http4s-ember-client" % Http4sVersion,
     ),
   )
+  .jvmSettings(
+    fork := true,
+  )
   .jsSettings(
     scalaJSUseMainModuleInitializer := true,
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)),
   )
