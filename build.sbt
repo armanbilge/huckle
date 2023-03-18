@@ -42,6 +42,23 @@ lazy val maven = crossProject(JVMPlatform, JSPlatform)
     ),
   )
 
+lazy val grpcScalac = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("grpc-scalac"))
+  .enablePlugins(Http4sGrpcPlugin)
+  .settings(
+    name := "huckle-grpc-scalac",
+    scalacOptions += "-Ykind-projector",
+    scalacOptions ~= (_.filterNot(
+      Set("-new-syntax", "-source:future", "-Ykind-projector:underscores"),
+    )),
+    libraryDependencies += "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf",
+    Compile / PB.protoSources += baseDirectory.value.getParentFile / "src" / "main" / "protobuf",
+    Compile / PB.targets ++= Seq(
+      scalapb.gen(grpc = false) -> (Compile / sourceManaged).value / "scalapb",
+    ),
+  )
+
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("tests"))

@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package huckle.grpc;
+
+import "scalapb/scalapb.proto";
+
+option (scalapb.options) = {
+  preserve_unknown_fields: false
+};
+
+service ScalacService {
+  rpc Compile (ScalacOptions) returns (stream Analysis);
+}
+
+message ScalacOptions {
+  string scalaVersion = 1;
+  repeated string options = 2;
+}
+
+message Analysis {
+  oneof data {
+    StartSource startSource = 1;
+    ClassDependency classDependency = 2;
+    BinaryDependency binaryDependency = 3;
+    GeneratedNonLocalClass generatedNonLocalClass = 4;
+    GeneratedLocalClass generatedLocalClass = 5;
+    Api api = 6;
+    MainClass mainClass = 7;
+    UsedName usedName = 8;
+    Problem problem = 9;
+    DependencyPhaseCompleted dependencyPhaseCompleted = 10;
+    ApiPhaseCompleted apiPhaseCompleted = 11;
+  }
+
+  message StartSource {
+    VirtualFile source = 1;
+  }
+
+  message ClassDependency {
+    string onClassName = 1;
+    string sourceClassName = 2;
+    DependencyContext context = 3;
+  }
+
+  message BinaryDependency {
+    Path onBinaryEntry = 1;
+    string onBinaryClassName = 2;
+    string fromClassName = 3;
+    VirtualFile fromSourceFile = 4;
+    DependencyContext context = 5;
+  }
+
+  message GeneratedNonLocalClass {
+    VirtualFile source = 1;
+    Path classFile = 2;
+    string binaryClassName = 3;
+    string srcClassName = 4;
+  }
+
+  message GeneratedLocalClass {
+    VirtualFile source = 1;
+    Path classFile = 2;
+  }
+
+  message Api {
+    VirtualFile sourceFile = 1;
+    ClassLike classApi = 2;
+  }
+
+  message MainClass {
+    VirtualFile sourceFile = 1;
+    string className = 2;
+  }
+
+  message UsedName {
+    string className = 1;
+    string name = 2;
+    repeated UseScope useScopes = 3;
+  }
+
+  message Problem {
+    string what = 1;
+    Position pos = 2;
+    string msg = 3;
+    Severity severity = 4;
+  }
+
+  message DependencyPhaseCompleted {}
+
+  message ApiPhaseCompleted {}
+}
+
+message VirtualFile {
+  string name = 1;
+}
+
+message Path {
+  string path = 1;
+}
+
+message ClassLike {
+  string name = 1;
+}
+
+enum DependencyContext {
+  DependencyByMemberRef = 0;
+  DependencyByInheritance = 1;
+  LocalDependencyByInheritance = 2;
+}
+
+enum UseScope {
+  Default = 0;
+  Implicit = 1;
+  Patmat = 2;
+}
+
+enum Severity {
+  Info = 0;
+  Warn = 1;
+  Error = 2;
+}
+
+message Position {
+  sint32 line = 1;
+  sint32 offset = 2;
+  string lineContent = 3;
+  sint32 pointer = 4;
+  string pointerSpace = 5;
+  string sourcePath = 6;
+  string sourceFilepath = 7;
+  sint32 startOffset = 8;
+  sint32 endOffset = 9;
+  sint32 startLine = 10;
+  sint32 startColumn = 11;
+  sint32 endLine = 12;
+  sint32 endColumn = 13;
+}
